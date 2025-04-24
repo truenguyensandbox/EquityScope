@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: equityscope-frontend
+    env: static
+    staticPublishPath: dist
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+    buildFilter:
+      paths:
+        - frontend/**
+
+  - type: web
+    name: equityscope-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn equityscope.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: equityscope-db
+          property: connectionString
+    buildFilter:
+      paths:
+        - backend/**
+
+databases:
+  - name: equityscope-db
+    databaseName: equityscope
+    user: equityscope_user
+    plan: free
